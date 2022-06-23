@@ -6,7 +6,7 @@ There are two target activities that impact the page.
 
 [//]: # (https://experience.adobe.com/#/@unifiedjslab/target/activities/activitydetails/A-B/aep-edge-samplesvecoffer)
 
-This is an A/B test activity created using the Visual Experience Composer (VEC).  It has two experiences each one changing the header text and adding an alert beneath it.
+Activity 1 is an A/B test activity created using the Visual Experience Composer (VEC).  It has two experiences each one changing the header text and adding an alert beneath it.
 
 | Experience                   | Visual treatment                                                    |
 |------------------------------|---------------------------------------------------------------------|
@@ -16,7 +16,7 @@ This is an A/B test activity created using the Visual Experience Composer (VEC).
 
 ## Activity 2
 [//]: # (https://experience.adobe.com/#/@unifiedjslab/target/activities/activitydetails/A-B/aep-edge-samplessample-hero-image)
-This is an A/B test activity created using the Form Based Composer.  It provides offers in the JSON format.  The client side implementation uses the JSON values to update the hero image and button text/actions on the page.
+This is an A/B test activity created using the Form Based Composer.  It provides offers in the JSON format.  The implementation uses the JSON values to update the hero image and button text/actions on the page.
 
 <table>
   <thead>
