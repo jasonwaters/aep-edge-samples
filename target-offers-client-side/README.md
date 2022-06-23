@@ -10,7 +10,7 @@ Here is what the page looks like before and after personalization content is ren
 
 | without target personalization                              | with target personalization                                       |
 |-------------------------------------------------------------|-------------------------------------------------------------------|
-| <img src="../.assets/plain.png" alt="drawing" width="400"/> | <img src="../.assets/with-offers.png" alt="drawing" width="400"/> |
+| <img src="../.assets/plain.png" alt="drawing" width="800"/> | <img src="../.assets/with-offers.png" alt="drawing" width="800"/> |
 
 Please review the [summary of target activities used](../TargetActivities.md) for this sample. 
 

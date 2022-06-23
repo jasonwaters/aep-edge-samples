@@ -10,9 +10,9 @@ This is an A/B test activity created using the Visual Experience Composer (VEC).
 
 | Experience                   | Visual treatment                                                    |
 |------------------------------|---------------------------------------------------------------------|
-| Experience A                 | <img src=".assets/activity-1-exp-A.png" alt="drawing" width="400"/> |
-| Experience B                 | <img src=".assets/activity-1-exp-B.png" alt="drawing" width="400"/> |
-| Default (no personalization) | <img src=".assets/activity-1-exp-0.png" alt="drawing" width="400"/> |
+| Experience A                 | <img src=".assets/activity-1-exp-A.png" alt="drawing" width="800"/> |
+| Experience B                 | <img src=".assets/activity-1-exp-B.png" alt="drawing" width="800"/> |
+| Default (no personalization) | <img src=".assets/activity-1-exp-0.png" alt="drawing" width="800"/> |
 
 ## Activity 2
 [//]: # (https://experience.adobe.com/#/@unifiedjslab/target/activities/activitydetails/A-B/aep-edge-samplessample-hero-image)
@@ -21,16 +21,16 @@ This is an A/B test activity created using the Form Based Composer.  It provides
 <table>
   <thead>
     <tr>
-      <td>Experience</td>
-      <td>JSON Offer</td>
-      <td>Visual treatment</td>
+      <th>Experience</th>
+      <th>JSON Offer / Visual treatment</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>Experience A</td>
       <td>
-        <pre>
+
+```json
 {
   "heroImageName": "demo-marketing-offer1-exp-A.png",
   "buttonActions": [
@@ -39,14 +39,15 @@ This is an A/B test activity created using the Form Based Composer.  It provides
     { "id": 3, "text": "Download", "content": "Downloading..." }
   ]
 }
-        </pre>
-      </td>
-      <td><a href=".assets/activity-2-exp-A.png"><img src=".assets/activity-2-exp-A.png" alt="drawing" width="400"/></a></td>
+```
+<img src=".assets/activity-2-exp-A.png" alt="drawing" width="800"/>
+</td>
     </tr>    
     <tr>
       <td>Experience B</td>
       <td>
-        <pre>
+
+```json
 {
   "heroImageName": "demo-marketing-offer1-exp-B.png",
   "buttonActions": [
@@ -55,14 +56,15 @@ This is an A/B test activity created using the Form Based Composer.  It provides
     { "id": 3, "text": "Get FREE stuff", "content": "Use coupon code THANKYOU at checkout." }
   ]
 }
-        </pre>
-      </td>
-      <td><img src=".assets/activity-2-exp-B.png" alt="drawing" width="400"/></td>
+```
+<img src=".assets/activity-2-exp-B.png" alt="drawing" width="800"/>
+</td>
     </tr>    
     <tr>
       <td>Default (no personalization)</td>
-      <td>N/A</td>
-      <td><img src=".assets/activity-2-exp-0.png" alt="drawing" width="400"/></td>
+      <td>
+        <img src=".assets/activity-2-exp-0.png" alt="drawing" width="800"/>
+      </td>
     </tr>
   </tbody>
 </table>
