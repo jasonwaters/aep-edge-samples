@@ -1,10 +1,10 @@
-# Target Offers Client Side
+# Target Offers Client-side
 
 ## Overview
 
-This sample demonstrates using Adobe Expreience Platform to get personalization offers from Target.  The web page changes based on the target offers returned.  
+This sample demonstrates using Adobe Expreience Platform to get personalization content from Adobe Target.  The web page changes based on the personalization content returned.  
 
-This sample uses the [Adobe Experience Platform Web SDK](https://experienceleague.adobe.com/docs/experience-platform/edge/home.html) to get target offers and to render them. 
+This sample uses the [Adobe Experience Platform Web SDK](https://experienceleague.adobe.com/docs/experience-platform/edge/home.html) to get personalization content and to render it entirely client-side. 
 
 Here is what the page looks like before and after personalization content is rendered. 
 

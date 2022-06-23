@@ -16,7 +16,7 @@ Activity 1 is an A/B test activity created using the Visual Experience Composer 
 
 ## Activity 2
 [//]: # (https://experience.adobe.com/#/@unifiedjslab/target/activities/activitydetails/A-B/aep-edge-samplessample-hero-image)
-This is an A/B test activity created using the Form Based Composer.  It provides offers in the JSON format.  The implementation uses the JSON values to update the hero image and button text/actions on the page.
+Activity 2 is an A/B test activity created using the Form Based Composer.  It provides offers in the JSON format.  The implementation uses the JSON values to update the hero image and button text/actions on the page.
 
 <table>
   <thead>
