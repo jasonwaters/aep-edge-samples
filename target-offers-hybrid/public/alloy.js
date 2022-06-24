@@ -1607,7 +1607,7 @@
   */
   var IDENTITY = "identity";
   var CONSENT = "consent";
-  var EDGE_PATH = "path";
+  var CLUSTER = "cluster";
 
   /*
   Copyright 2020 Adobe. All rights reserved.
@@ -3046,30 +3046,6 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
   */
-
-  /**
-   * Returns an array whose items are the provided object's own enumerable
-   * property values.
-   * @param {Object} obj
-   * @returns {Array}
-   */
-  var values = (function (obj) {
-    return Object.keys(obj).map(function (key) {
-      return obj[key];
-    });
-  });
-
-  /*
-  Copyright 2019 Adobe. All rights reserved.
-  This file is licensed to you under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License. You may obtain a copy
-  of the License at http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software distributed under
-  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
-  OF ANY KIND, either express or implied. See the License for the specific language
-  governing permissions and limitations under the License.
-  */
   var debugQueryParam = "alloy_debug";
 
   /*
@@ -3851,6 +3827,20 @@
   });
 
   /*
+  Copyright 2020 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+  */
+  var CONFIGURE = "configure";
+  var SET_DEBUG = "setDebug";
+
+  /*
   Copyright 2019 Adobe. All rights reserved.
   This file is licensed to you under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License. You may obtain a copy
@@ -3861,10 +3851,6 @@
   OF ANY KIND, either express or implied. See the License for the specific language
   governing permissions and limitations under the License.
   */
-  var coreCommands = {
-    CONFIGURE: "configure",
-    SET_DEBUG: "setDebug"
-  };
   var injectExecuteCommand = (function (_ref) {
     var logger = _ref.logger,
         configureCommand = _ref.configureCommand,
@@ -3876,7 +3862,7 @@
     var getExecutor = function getExecutor(commandName, options) {
       var executor;
 
-      if (commandName === coreCommands.CONFIGURE) {
+      if (commandName === CONFIGURE) {
         if (configurePromise) {
           throw new Error("The library has already been configured and may only be configured once.");
         }
@@ -3891,7 +3877,7 @@
           throw new Error("The library must be configured first. Please do so by executing the configure command.");
         }
 
-        if (commandName === coreCommands.SET_DEBUG) {
+        if (commandName === SET_DEBUG) {
           executor = function executor() {
             return setDebugCommand(options);
           };
@@ -3901,7 +3887,7 @@
               var command = componentRegistry.getCommand(commandName);
 
               if (!command || !isFunction(command.run)) {
-                var commandNames = values(coreCommands).concat(componentRegistry.getCommandNames()).join(", ");
+                var commandNames = [CONFIGURE, SET_DEBUG].concat(componentRegistry.getCommandNames()).join(", ");
                 throw new Error("The " + commandName + " command does not exist. List of available commands: " + commandNames + ".");
               }
 
@@ -8646,7 +8632,7 @@
   */
   // The __VERSION__ keyword will be replace at alloy build time with the package.json version.
   // see babel-plugin-version
-  var libraryVersion = "2.11.0-beta.2";
+  var libraryVersion = "2.11.0";
 
   /*
   Copyright 2019 Adobe. All rights reserved.
@@ -9160,27 +9146,42 @@
   createEventMerge.namespace = "EventMerge";
   createEventMerge.configValidators = {};
 
-  /*
-  Copyright 2019 Adobe. All rights reserved.
-  This file is licensed to you under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License. You may obtain a copy
-  of the License at http://www.apache.org/licenses/LICENSE-2.0
+  var prepareLibraryInfo = function prepareLibraryInfo(_ref) {
+    var config = _ref.config,
+        componentRegistry = _ref.componentRegistry;
+    var allCommands = [].concat(_toConsumableArray(componentRegistry.getCommandNames()), [CONFIGURE, SET_DEBUG]).sort();
 
-  Unless required by applicable law or agreed to in writing, software distributed under
-  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
-  OF ANY KIND, either express or implied. See the License for the specific language
-  governing permissions and limitations under the License.
-  */
+    var resultConfig = _objectSpread2({}, config);
 
-  var createLibraryInfo = function createLibraryInfo() {
+    Object.keys(config).forEach(function (key) {
+      var value = config[key];
+
+      if (typeof value !== "function") {
+        return;
+      }
+
+      resultConfig[key] = value.toString();
+    });
+    return {
+      version: libraryVersion,
+      configs: resultConfig,
+      commands: allCommands
+    };
+  };
+
+  var createLibraryInfo = function createLibraryInfo(_ref2) {
+    var config = _ref2.config,
+        componentRegistry = _ref2.componentRegistry;
+    var libraryInfo = prepareLibraryInfo({
+      config: config,
+      componentRegistry: componentRegistry
+    });
     return {
       commands: {
         getLibraryInfo: {
           run: function run() {
             return {
-              libraryInfo: {
-                version: libraryVersion
-              }
+              libraryInfo: libraryInfo
             };
           }
         }
@@ -9792,10 +9793,6 @@
         apexDomain = _ref.apexDomain,
         dateProvider = _ref.dateProvider;
     return {
-      getPathFromCookie: function getPathFromCookie() {
-        return cookieJar.get(getNamespacedCookieName(orgId, EDGE_PATH));
-      },
-
       /**
        * When sending to a third-party endpoint, the endpoint won't be able to
        * access first-party cookies, therefore we transfer cookies into
@@ -9895,7 +9892,8 @@
         cookieTransfer = _ref.cookieTransfer,
         sendNetworkRequest = _ref.sendNetworkRequest,
         createResponse = _ref.createResponse,
-        processWarningsAndErrors = _ref.processWarningsAndErrors;
+        processWarningsAndErrors = _ref.processWarningsAndErrors,
+        getLocationHint = _ref.getLocationHint;
     var edgeDomain = config.edgeDomain,
         edgeBasePath = config.edgeBasePath,
         edgeConfigId = config.edgeConfigId;
@@ -9922,9 +9920,9 @@
         onRequestFailure: onRequestFailureCallbackAggregator.add
       }).then(function () {
         var endpointDomain = request.getUseIdThirdPartyDomain() ? ID_THIRD_PARTY : edgeDomain;
-        var pathFromCookie = cookieTransfer.getPathFromCookie();
-        var basePath = pathFromCookie !== undefined ? pathFromCookie : endpointDomain + "/" + edgeBasePath;
-        var url = "https://" + basePath + "/" + apiVersion + "/" + request.getAction() + "?configId=" + edgeConfigId + "&requestId=" + request.getId();
+        var locationHint = getLocationHint();
+        var edgeBasePathWithLocationHint = locationHint ? edgeBasePath + "/" + locationHint : edgeBasePath;
+        var url = "https://" + endpointDomain + "/" + edgeBasePathWithLocationHint + "/" + apiVersion + "/" + request.getAction() + "?configId=" + edgeConfigId + "&requestId=" + request.getId();
         cookieTransfer.cookiesToPayload(request.getPayload(), endpointDomain);
         return sendNetworkRequest({
           requestId: request.getId(),
@@ -10021,6 +10019,26 @@
           logger.error(MESSAGE_PREFIX + " non-fatal error:", error);
         });
       }
+    };
+  });
+
+  /*
+  Copyright 2022 Adobe. All rights reserved.
+  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License. You may obtain a copy
+  of the License at http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software distributed under
+  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+  OF ANY KIND, either express or implied. See the License for the specific language
+  governing permissions and limitations under the License.
+  */
+  var injectGetLocationHint = (function (_ref) {
+    var orgId = _ref.orgId,
+        cookieJar = _ref.cookieJar;
+    var clusterCookieName = getNamespacedCookieName(orgId, CLUSTER);
+    return function () {
+      return cookieJar.get(clusterCookieName);
     };
   });
 
@@ -10209,9 +10227,10 @@
         logger: logger,
         setDebugEnabled: setDebugEnabled
       });
+      var orgId = config.orgId;
       var cookieTransfer = createCookieTransfer({
         cookieJar: loggingCookieJar,
-        orgId: config.orgId,
+        orgId: orgId,
         apexDomain: apexDomain,
         dateProvider: function dateProvider() {
           return new Date();
@@ -10240,13 +10259,18 @@
       var createResponse = injectCreateResponse({
         extractEdgeInfo: extractEdgeInfo
       });
+      var getLocationHint = injectGetLocationHint({
+        orgId: orgId,
+        cookieJar: reactorCookie
+      });
       var sendEdgeNetworkRequest = injectSendEdgeNetworkRequest({
         config: config,
         lifecycle: lifecycle,
         cookieTransfer: cookieTransfer,
         sendNetworkRequest: sendNetworkRequest,
         createResponse: createResponse,
-        processWarningsAndErrors: processWarningsAndErrors
+        processWarningsAndErrors: processWarningsAndErrors,
+        getLocationHint: getLocationHint
       });
       var applyEdgeResponseHandles = injectApplyEdgeResponseHandles({
         lifecycle: lifecycle,
@@ -10279,6 +10303,7 @@
           var componentLogger = createComponentLogger(componentName);
           return {
             config: config,
+            componentRegistry: componentRegistry,
             consent: consent,
             eventManager: eventManager,
             fireReferrerHideableImage: fireReferrerHideableImage,

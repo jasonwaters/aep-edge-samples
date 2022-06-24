@@ -1,13 +1,4 @@
-const {
-  getAepCookieName,
-  COOKIE_NAME_AEP_EDGE_PATH,
-  getAepEdgePath,
-  TYPE_STATE_STORE,
-  AEP_COOKIE_PREFIX,
-} = require("./aepEdgeClient");
-
-const SECONDS_PER_MINUTE = 60;
-const DEFAULT_COOKIE_EXPIRE_MINS = 31;
+const { TYPE_STATE_STORE, AEP_COOKIE_PREFIX } = require("./aepEdgeClient");
 
 /**
  * Sets cookies in the response object
@@ -28,15 +19,14 @@ function saveCookie(req, res, cookie) {
   });
 }
 
+/**
+ * If there are cookies in the set "state:store" handle of the exp edge response, set them on the response object
+ * @param organizationId
+ * @param req
+ * @param res
+ * @param aepEdgeResult
+ */
 function saveAepEdgeCookies(organizationId, { req, res, aepEdgeResult }) {
-  //location hint cookie
-  saveCookie(req, res, {
-    name: getAepCookieName(organizationId, COOKIE_NAME_AEP_EDGE_PATH),
-    value: getAepEdgePath(aepEdgeResult.response.headers["x-adobe-edge"]),
-    maxAge: SECONDS_PER_MINUTE * DEFAULT_COOKIE_EXPIRE_MINS,
-  });
-
-  // set cookies from state:store
   const { handle = [] } = aepEdgeResult.response.body;
   handle
     .filter((item) => item.type === TYPE_STATE_STORE)

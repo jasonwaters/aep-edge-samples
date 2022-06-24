@@ -32,6 +32,7 @@
     alloy("configure", {
       "edgeConfigId": "{{edgeConfigId}}",
       "orgId":"{{orgId}}",
+      "edgeBasePath": "ee-pre-prd",
       "context": ["web"],
       "debugEnabled": false
     });
@@ -88,7 +89,7 @@
     </div>
   </div>
   <script>
-    alloy("applyHandles", {{safeString applyHandlesParam}}).then(applyPersonalization("{{demoDecisionScopeName}}"));;
+    alloy("applyHandles", {{safeString applyHandlesParam}}).then(applyPersonalization("{{demoDecisionScopeName}}"));
   </script>
 </body>
 </html>

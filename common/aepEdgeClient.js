@@ -1,5 +1,6 @@
-const { uuid, isDefined, isUndefined } = require("@adobe/target-tools");
+const { uuid } = require("@adobe/target-tools");
 const fetch = require("node-fetch");
+const { isNotBlank } = require("@adobe/target-tools");
 
 const PAGE_WIDE_SCOPE = "__view__";
 const AEP_COOKIE_PREFIX = "kndctr";
@@ -8,7 +9,10 @@ const TYPE_STATE_STORE = "state:store";
 const TYPE_IDENTITY_RESULT = "identity:result";
 const TYPE_PERSONALIZATION = "personalization:decisions";
 
-const COOKIE_NAME_AEP_EDGE_PATH = "path";
+const COOKIE_NAME_AEP_EDGE_CLUSTER = "cluster";
+
+const EXP_EDGE_BASE_PATH_PROD = "ee";
+const EXP_EDGE_BASE_PATH_STAGE = "ee-pre-prd";
 
 let DEFAULT_REQUEST_HEADERS = {
   accept: "*/*",
@@ -23,17 +27,7 @@ let DEFAULT_REQUEST_HEADERS = {
   "Referrer-Policy": "strict-origin-when-cross-origin",
 };
 
-const AEP_EDGE_CLUSTERS = {
-  "SGP3;3": "konductor-prod.ethos11-prod-sgp3.ethos.adobe.net",
-  "IRL1;6": "konductor-prod.ethos12-prod-irl1.ethos.adobe.net",
-  "VA6;7": "konductor-prod.ethos10-prod-va6.ethos.adobe.net",
-  "AUS3;8": "konductor-prod.ethos11-prod-aus3.ethos.adobe.net",
-  "OR2;9": "konductor-prod.ethos12-prod-or2.ethos.adobe.net",
-  "JPN3;11": "konductor-prod.ethos12-prod-jpn3.ethos.adobe.net",
-  "IND1;12": "konductor-prod.ethos11-prod-ind1.ethos.adobe.net",
-};
-
-const AEP_EDGE_DEFAULT_BASE_URL = "edge.adobedc.net/ee";
+const AEP_EDGE_DOMAIN = "edge.adobedc.net";
 
 const SCHEMAS_PERSONALIZATION = [
   "https://ns.adobe.com/personalization/default-content-item",
@@ -42,16 +36,6 @@ const SCHEMAS_PERSONALIZATION = [
   "https://ns.adobe.com/personalization/redirect-item",
   "https://ns.adobe.com/personalization/dom-action",
 ];
-
-function getBaseUrl(locationHint) {
-  if (isUndefined(locationHint)) {
-    return AEP_EDGE_DEFAULT_BASE_URL;
-  }
-
-  const base_url = AEP_EDGE_CLUSTERS[locationHint];
-
-  return isDefined(base_url) ? base_url : AEP_EDGE_DEFAULT_BASE_URL;
-}
 
 function convertHeadersToSimpleJson(res) {
   const headersPromise = new Promise((resolve) => {
@@ -88,15 +72,26 @@ function logResult(message) {
 /**
  *
  * @param {string} edgeConfigId
- * @param {string} aepEdgePath
+ * @param {string} aepEdgeCluster cluster hint
+ * @param {string} edgeBasePath
  */
 function createAepEdgeClient(
   edgeConfigId,
-  aepEdgePath = AEP_EDGE_DEFAULT_BASE_URL
+  aepEdgeCluster = "",
+  edgeBasePath = EXP_EDGE_BASE_PATH_PROD
 ) {
   function interact(requestBody, requestHeaders = {}) {
     const requestId = uuid();
-    const requestUrl = `https://${aepEdgePath}/v2/interact?dataStreamId=${edgeConfigId}&requestId=${requestId}`;
+
+    const requestUrl = [
+      `https://${AEP_EDGE_DOMAIN}`,
+      edgeBasePath,
+      aepEdgeCluster,
+      "v2",
+      `interact?dataStreamId=${edgeConfigId}&requestId=${requestId}`,
+    ]
+      .filter(isNotBlank)
+      .join("/");
 
     const headers = {
       ...DEFAULT_REQUEST_HEADERS,
@@ -155,10 +150,10 @@ function getAepCookieName(organizationId, name) {
   return [AEP_COOKIE_PREFIX, organizationId.replace("@", "_"), name].join("_");
 }
 
-function getAepEdgePathCookie(organizationId, req) {
+function getAepEdgeClusterCookie(organizationId, req) {
   const cookieName = getAepCookieName(
     organizationId,
-    COOKIE_NAME_AEP_EDGE_PATH
+    COOKIE_NAME_AEP_EDGE_CLUSTER
   );
 
   return req.cookies[cookieName];
@@ -189,15 +184,17 @@ function getResponseHandles(aepEdgeResult) {
 
 module.exports = {
   getAepCookieName,
-  getAepEdgePathCookie,
+  getAepEdgeClusterCookie,
   createAepEdgeClient,
   AEP_COOKIE_PREFIX,
   PAGE_WIDE_SCOPE,
-  COOKIE_NAME_AEP_EDGE_PATH,
+  COOKIE_NAME_AEP_EDGE_PATH: COOKIE_NAME_AEP_EDGE_CLUSTER,
   TYPE_PERSONALIZATION,
   TYPE_STATE_STORE,
   TYPE_IDENTITY_RESULT,
-  getAepEdgePath: getBaseUrl,
+  AEP_EDGE_BASE_URL: AEP_EDGE_DOMAIN,
+  EXP_EDGE_BASE_PATH_PROD,
+  EXP_EDGE_BASE_PATH_STAGE,
   createIdentityPayload,
   getResponseHandles,
 };

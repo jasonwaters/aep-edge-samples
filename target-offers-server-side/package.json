@@ -1,11 +1,11 @@
 {
-  "name": "target-offers-hybrid-aep-sample",
+  "name": "target-offers-server-side-aep-sample",
   "version": "1.0.0",
   "description": "",
   "main": "src/server.js",
   "scripts": {
     "postinstall": "cd ../common && npm i",
-    "start": "PORT=80 node src/server.js"
+    "start": "node src/server.js"
   },
   "repository": {
     "type": "git",

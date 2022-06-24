@@ -14,11 +14,11 @@ const {
   loadHandlebarsTemplate,
 } = require("aep-edge-samples-common/templating");
 
-const { isDefined } = require("@adobe/target-tools");
+const { isString } = require("@adobe/target-tools");
 const {
-  getAepEdgePathCookie,
-  TYPE_STATE_STORE,
   getResponseHandles,
+  getAepEdgeClusterCookie,
+  EXP_EDGE_BASE_PATH_STAGE,
 } = require("aep-edge-samples-common");
 const {
   requestAepEdgePersonalization,
@@ -27,12 +27,11 @@ const {
 const { saveAepEdgeCookies } = require("aep-edge-samples-common/cookies");
 const { sendResponse } = require("aep-edge-samples-common/utils");
 
-const { EDGE_CONFIG_ID, ORGANIZATION_ID, demoDecisionScopeName, FPID } =
+const { EDGE_CONFIG_ID, ORGANIZATION_ID, demoDecisionScopeName, FPID, PORT } =
   process.env;
 
 // Initialize the Express app
 const app = express();
-const PORT = process.env.PORT;
 
 // Setup cookie parsing middleware and static file serving from the /public directory
 app.use(cookieParser());
@@ -61,16 +60,19 @@ function prepareTemplateVariables(handles, personalizationOfferItems) {
 app.get("/", async (req, res) => {
   const aepEdgeClient = createAepEdgeClient(
     EDGE_CONFIG_ID,
-    getAepEdgePathCookie(ORGANIZATION_ID, req)
+    getAepEdgeClusterCookie(ORGANIZATION_ID, req),
+    EXP_EDGE_BASE_PATH_STAGE
   );
 
   const aepEdgeResult = await requestAepEdgePersonalization(
     aepEdgeClient,
     req,
     [demoDecisionScopeName],
-    {
-      FPID: [isDefined(FPID) ? createIdentityPayload(FPID) : []],
-    }
+    isString(FPID) && FPID.length > 0
+      ? {
+          FPID: [createIdentityPayload(FPID)],
+        }
+      : {}
   );
 
   const template = loadHandlebarsTemplate("index");
