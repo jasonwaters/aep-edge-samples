@@ -22,7 +22,8 @@ const {
 } = require("aep-edge-samples-common");
 const {
   requestAepEdgePersonalization,
-  getPersonalizationOfferItems,
+  getPersonalizationOffer,
+  sendDisplayEvent,
 } = require("aep-edge-samples-common/personalization");
 const { saveAepEdgeCookies } = require("aep-edge-samples-common/cookies");
 const { sendResponse } = require("aep-edge-samples-common/utils");
@@ -37,7 +38,7 @@ const app = express();
 app.use(cookieParser());
 app.use(express.static(path.resolve(__dirname, "..", "public")));
 
-function prepareTemplateVariables(handles, personalizationOfferItems) {
+function prepareTemplateVariables(handles, personalizationOfferItems = []) {
   const templateVariables = {
     heroImageName: "demo-marketing-offer1-default.png",
     buttonActions: [],
@@ -77,9 +78,16 @@ app.get("/", async (req, res) => {
 
   const template = loadHandlebarsTemplate("index");
 
+  const personalizationOffer = getPersonalizationOffer(
+    aepEdgeResult,
+    demoDecisionScopeName
+  );
+
+  sendDisplayEvent(aepEdgeClient, req, [personalizationOffer]);
+
   const templateVariables = prepareTemplateVariables(
     getResponseHandles(aepEdgeResult),
-    getPersonalizationOfferItems(aepEdgeResult, demoDecisionScopeName)
+    personalizationOffer.items
   );
 
   const context = {

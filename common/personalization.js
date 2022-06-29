@@ -44,6 +44,50 @@ function requestAepEdgePersonalization(
   });
 }
 
+function sendDisplayEvent(aepEdgeClient, req, propositions) {
+  const address = getAddress(req);
+  const cookieEntries = getCookieEntries(req);
+
+  aepEdgeClient.interact(
+    {
+      event: {
+        xdm: {
+          web: {
+            webPageDetails: { URL: address },
+            webReferrer: { URL: "" },
+          },
+          timestamp: new Date().toISOString(),
+          eventType: "decisioning.propositionDisplay",
+          _experience: {
+            decisioning: {
+              propositions: propositions.map((proposition) => {
+                const { id, scope, scopeDetails } = proposition;
+
+                return {
+                  id,
+                  scope,
+                  scopeDetails,
+                };
+              }),
+            },
+          },
+        },
+      },
+      query: { identity: { fetch: ["ECID"] } },
+      meta: {
+        state: {
+          domain: "",
+          cookiesEnabled: true,
+          entries: [...cookieEntries],
+        },
+      },
+    },
+    {
+      Referer: address,
+    }
+  );
+}
+
 function getPersonalizationPayloads(aepEdgeResult) {
   const { response = {} } = aepEdgeResult;
   const { body = {} } = response;
@@ -56,17 +100,17 @@ function getPersonalizationPayloads(aepEdgeResult) {
   return payloadList;
 }
 
-function getPersonalizationOfferItems(aepEdgeResult, decisionScopeName) {
-  const offer =
+function getPersonalizationOffer(aepEdgeResult, decisionScopeName) {
+  return (
     getPersonalizationPayloads(aepEdgeResult).find(
       (payload) => payload.scope === decisionScopeName
-    ) || {};
-  const { items: offerItems = [] } = offer;
-  return offerItems;
+    ) || {}
+  );
 }
 
 module.exports = {
   requestAepEdgePersonalization,
   getPersonalizationPayloads,
-  getPersonalizationOfferItems,
+  getPersonalizationOffer,
+  sendDisplayEvent,
 };
