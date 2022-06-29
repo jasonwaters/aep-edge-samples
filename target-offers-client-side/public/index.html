@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Target Hybrid Sample</title>
+  <title>Target client-side sample</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <link rel="icon" href="https://wwwimages2.adobe.com/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css">
@@ -39,17 +39,17 @@
 
   <script>
     const demoDecisionScopeName = "sample-json-offer"; // also known as a target mbox
-    const FPID = createIdentityPayload("xyz");
+    const FPID = createIdentityPayload("xyz123");
 
     alloy("sendEvent",
       {
         "renderDecisions": true,
         decisionScopes: [demoDecisionScopeName],
-        "xdm": {
+        "xdm": FPID ? {
           identityMap: {
-            "FPID": FPID ? [FPID] : []
+            "FPID": [FPID]
           }
-        }
+        } : {}
       }
     ).then(applyPersonalization(demoDecisionScopeName));
   </script>

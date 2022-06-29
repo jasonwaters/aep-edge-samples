@@ -2,7 +2,7 @@
 
 ## Overview
 
-This sample demonstrates using Adobe Expreience Platform to get personalization content from Adobe Target.  The web page changes based on the personalization content returned.  
+This sample demonstrates using Adobe Experience Platform to get personalization content from Adobe Target.  The web page changes based on the personalization content returned.  
 
 This sample uses the [Adobe Experience Platform Web SDK](https://experienceleague.adobe.com/docs/experience-platform/edge/home.html) to get personalization content and to render it entirely client-side. 
 
@@ -41,8 +41,8 @@ alloy("sendEvent", {
 ```
 
 3. Alloy renders page load Visual Experience Composer (VEC) offers automatically because the `renderDecisions` flag is set to true.
-4. Form-based JSON offers are used in the sample implementation's [`applyPersonalization`](./public/script.js) method to update the DOM based on the offer.
-5. For form-based activities, display events must manually be sent in the implementation to indicate when the mbox offer has been displayed. This is done via the `sendEvent` command.
+4. Form-based JSON offers are manually applied by the sample implementation code (in the [`applyPersonalization`](./public/script.js) method) to update the DOM based on the offer.
+5. For form-based activities, display events must manually be sent to indicate when the offer has been displayed. This is done via the `sendEvent` command.
 
 ```javascript
 function sendDisplayEvent(decision) {
@@ -66,6 +66,30 @@ function sendDisplayEvent(decision) {
   });
 }
 ```
+
+## Key Observations
+
+### Cookies
+Cookies are used to persist user identity and cluster information.  When using a client-side implementation, the Web SDK handles the storing and sending of these cookies automatically during the request lifecycle.
+
+| Cookie                   | Purpose                                                                   | Stored by | Sent by |
+|--------------------------|---------------------------------------------------------------------------|-----------|---------|
+| kndctr_AdobeOrg_identity | Contains user idenity details                                             | Web SDK   | Web SDK |
+| kndctr_AdobeOrg_cluster  | Indicates which experience edge cluser should be used to fulfill requests | Web SDK   | Web SDK |
+
+
+### Request placement
+
+Requests to Adobe Experience Platform API are required to get propositions and send a display notification.  When using a client-side implementation, the Web SDK makes these reqeusts when the `sendEvent` command is used.
+
+| Request                                        | Made by                             |
+|------------------------------------------------|-------------------------------------|
+| interact request to get propositions           | Web SDK using the sendEvent command |
+| interact request to send display notifications | Web SDK using the sendEvent command |
+
+### Flow Diagram
+
+<img src="../.assets/diagram-client-side.png" alt="drawing" />
 
 ## Beyond the sample
 
