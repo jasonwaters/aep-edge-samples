@@ -110,8 +110,8 @@ fetch(
 ).then((res) => res.json());
 ```
 
-3. The target offer form the form-based activity is read from the response and used while generating the HTML response.
-4. For form-based activities, display events must manually be sent in the implementation to indicate when the offer has been displayed. In this example the notification is sent server-side during the request lifecycle.
+4. The target offer from the form-based activity is read from the response and used when producing the HTML response.
+5. For form-based activities, display events must manually be sent in the implementation to indicate when the offer has been displayed. In this example the notification is sent server-side during the request lifecycle.
 
 ```javascript
 function sendDisplayEvent(aepEdgeClient, req, propositions) {
@@ -158,8 +158,8 @@ function sendDisplayEvent(aepEdgeClient, req, propositions) {
   );
 }
 ```
-5. Visual Experience Composer (VEC) offers are ignored since the Web SDK is required to render them.
-6. When the HTML response is returned, the identity and cluster cookies are set on the response by the application server.
+6. Visual Experience Composer (VEC) offers are ignored since the Web SDK is required to render them.
+7. When the HTML response is returned, the identity and cluster cookies are set on the response by the application server.
  
 ## Key Observations
 

@@ -23,7 +23,7 @@ const {
 } = require("aep-edge-samples-common");
 const {
   requestAepEdgePersonalization,
-  getPersonalizationOfferItems,
+  getPersonalizationOffer,
 } = require("aep-edge-samples-common/personalization");
 const { saveAepEdgeCookies } = require("aep-edge-samples-common/cookies");
 const { sendResponse } = require("aep-edge-samples-common/utils");
@@ -77,7 +77,7 @@ app.get("/", async (req, res) => {
 
   const templateVariables = prepareTemplateVariables(
     getResponseHandles(aepEdgeResult),
-    getPersonalizationOfferItems(aepEdgeResult, demoDecisionScopeName)
+    getPersonalizationOffer(aepEdgeResult, demoDecisionScopeName).items
   );
 
   const context = {
