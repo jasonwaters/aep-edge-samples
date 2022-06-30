@@ -101,3 +101,5 @@ dist
 
 .idea
 .DS_Store
+
+alloy.js
