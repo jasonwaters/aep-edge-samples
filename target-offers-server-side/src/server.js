@@ -25,7 +25,10 @@ const {
   getPersonalizationOffer,
   sendDisplayEvent,
 } = require("aep-edge-samples-common/personalization");
-const { saveAepEdgeCookies } = require("aep-edge-samples-common/cookies");
+const {
+  saveAepEdgeCookies,
+  getAepEdgeCookies,
+} = require("aep-edge-samples-common/cookies");
 const { sendResponse } = require("aep-edge-samples-common/utils");
 
 const { EDGE_CONFIG_ID, ORGANIZATION_ID, demoDecisionScopeName, FPID, PORT } =
@@ -65,6 +68,8 @@ app.get("/", async (req, res) => {
     EXP_EDGE_BASE_PATH_STAGE
   );
 
+  const aepEdgeCookies = getAepEdgeCookies(req);
+
   const aepEdgeResult = await requestAepEdgePersonalization(
     aepEdgeClient,
     req,
@@ -73,7 +78,8 @@ app.get("/", async (req, res) => {
       ? {
           FPID: [createIdentityPayload(FPID)],
         }
-      : {}
+      : {},
+    aepEdgeCookies
   );
 
   const template = loadHandlebarsTemplate("index");
@@ -83,7 +89,7 @@ app.get("/", async (req, res) => {
     demoDecisionScopeName
   );
 
-  sendDisplayEvent(aepEdgeClient, req, [personalizationOffer]);
+  sendDisplayEvent(aepEdgeClient, req, [personalizationOffer], aepEdgeCookies);
 
   const templateVariables = prepareTemplateVariables(
     getResponseHandles(aepEdgeResult),

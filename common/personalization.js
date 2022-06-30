@@ -1,7 +1,6 @@
 const { PAGE_WIDE_SCOPE, TYPE_PERSONALIZATION } = require("./aepEdgeClient");
 
 const { getAddress } = require("./utils");
-const { getCookieEntries } = require("./cookies");
 
 /**
  * Requests propositions from the Adobe Experience Edge API
@@ -9,16 +8,17 @@ const { getCookieEntries } = require("./cookies");
  * @param req request object
  * @param decisionScopes array of decision scopes to retrieve (global page-wide scope included by default)
  * @param identityMap object with identities
+ * @param cookieEntries
  * @returns {Promise<*>}
  */
 function requestAepEdgePersonalization(
   aepEdgeClient,
   req,
   decisionScopes = [],
-  identityMap = {}
+  identityMap = {},
+  cookieEntries = []
 ) {
   const address = getAddress(req);
-  const cookieEntries = getCookieEntries(req);
 
   return aepEdgeClient.getPropositions({
     decisionScopes: [PAGE_WIDE_SCOPE, ...decisionScopes],
@@ -44,9 +44,15 @@ function requestAepEdgePersonalization(
   });
 }
 
-function sendDisplayEvent(aepEdgeClient, req, propositions) {
+/**
+ *
+ * @param aepEdgeClient
+ * @param req
+ * @param propositions
+ * @param cookieEntries
+ */
+function sendDisplayEvent(aepEdgeClient, req, propositions, cookieEntries) {
   const address = getAddress(req);
-  const cookieEntries = getCookieEntries(req);
 
   aepEdgeClient.interact(
     {

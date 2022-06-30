@@ -46,7 +46,7 @@ function saveAepEdgeCookies(organizationId, { req, res, aepEdgeResult }) {
  * @param req request object
  * @returns {*[]} Array of cookies
  */
-function getCookieEntries(req) {
+function getAepEdgeCookies(req) {
   const entries = [];
 
   Object.keys(req.cookies)
@@ -63,5 +63,5 @@ function getCookieEntries(req) {
 
 module.exports = {
   saveAepEdgeCookies,
-  getCookieEntries,
+  getAepEdgeCookies,
 };

@@ -114,9 +114,8 @@ fetch(
 5. For form-based activities, display events must manually be sent in the implementation to indicate when the offer has been displayed. In this example the notification is sent server-side during the request lifecycle.
 
 ```javascript
-function sendDisplayEvent(aepEdgeClient, req, propositions) {
+function sendDisplayEvent(aepEdgeClient, req, propositions, cookieEntries) {
   const address = getAddress(req);
-  const cookieEntries = getCookieEntries(req);
 
   aepEdgeClient.interact(
     {
