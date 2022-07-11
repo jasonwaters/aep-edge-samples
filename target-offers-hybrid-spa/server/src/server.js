@@ -1,6 +1,8 @@
 const path = require("path");
 
-require("dotenv").config({ path: path.resolve(process.cwd(), "..", ".env") });
+require("dotenv").config({
+  path: path.resolve(process.cwd(), "..", ".env"),
+});
 
 const express = require("express");
 const cookieParser = require("cookie-parser");
@@ -48,6 +50,13 @@ function prepareTemplateVariables({ response = {} }) {
     applyAepEdgeResponseParam: JSON.stringify(
       {
         renderDecisions: true,
+        xdm: {
+          web: {
+            webPageDetails: {
+              viewName: "home",
+            },
+          },
+        },
         responseHeaders: headers,
         responseBody: {
           ...body,
@@ -81,7 +90,7 @@ app.get("/", async (req, res) => {
     aepEdgeCookies
   );
 
-  const template = loadHandlebarsTemplate("index");
+  const template = loadHandlebarsTemplate("index", "server/src/templates");
 
   const templateVariables = prepareTemplateVariables(aepEdgeResult);
 

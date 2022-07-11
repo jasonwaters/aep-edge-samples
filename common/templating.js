@@ -8,12 +8,15 @@ Handlebars.registerHelper("safeString", function (inputData) {
 
 const templateCache = {};
 
-function loadHandlebarsTemplate(fileName = "index") {
+function loadHandlebarsTemplate(
+  fileName = "index",
+  templatesPath = "src/templates"
+) {
   if (isUndefined(templateCache[fileName])) {
     templateCache[fileName] = Handlebars.compile(
       fs
         .readFileSync(
-          `${process.cwd()}/src/templates/${
+          `${process.cwd()}/${templatesPath}/${
             fileName.length === 0 ? "index" : fileName
           }.handlebars`
         )
