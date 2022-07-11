@@ -8,11 +8,16 @@ const AEP_COOKIE_PREFIX = "kndctr";
 const TYPE_STATE_STORE = "state:store";
 const TYPE_IDENTITY_RESULT = "identity:result";
 const TYPE_PERSONALIZATION = "personalization:decisions";
+const TYPE_LOCATION_HINT = "locationHint:result";
 
 const COOKIE_NAME_AEP_EDGE_CLUSTER = "cluster";
 
 const EXP_EDGE_BASE_PATH_PROD = "ee";
 const EXP_EDGE_BASE_PATH_STAGE = "ee-pre-prd";
+
+const CLUSTER_HINT_EDGE = "EdgeNetwork";
+const CLUSTER_HINT_AAM = "AAM";
+const CLUSTER_HINT_TARGET = "Targer";
 
 let DEFAULT_REQUEST_HEADERS = {
   accept: "*/*",
@@ -69,6 +74,25 @@ function logResult(message) {
   };
 }
 
+function extractEdgeCluster([responseHeaders, responseBody], aepEdgeCluster) {
+  const locationHintHandle = responseBody.handle.find(
+    (item) => item.type === TYPE_LOCATION_HINT
+  );
+
+  if (!locationHintHandle) {
+    return aepEdgeCluster;
+  }
+
+  const { payload = [] } = locationHintHandle;
+  const edgeHint = payload.find((item) => item.scope === CLUSTER_HINT_EDGE);
+
+  if (!edgeHint) {
+    return aepEdgeCluster;
+  }
+
+  return edgeHint.hint;
+}
+
 /**
  *
  * @param {string} edgeConfigId
@@ -104,6 +128,10 @@ function createAepEdgeClient(
       method: "POST",
     })
       .then(convertHeadersToSimpleJson)
+      .then((response) => {
+        aepEdgeCluster = extractEdgeCluster(response, aepEdgeCluster);
+        return response;
+      })
       .then(prepareAepResponse(headers, requestBody))
       .then(logResult(`AEP EDGE REQUEST: ${requestUrl}`));
   }

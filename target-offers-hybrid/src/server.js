@@ -19,7 +19,6 @@ const {
   TYPE_STATE_STORE,
   getResponseHandles,
   getAepEdgeClusterCookie,
-  EXP_EDGE_BASE_PATH_STAGE,
 } = require("aep-edge-samples-common");
 const {
   requestAepEdgePersonalization,
@@ -61,8 +60,7 @@ function prepareTemplateVariables(handles) {
 app.get("/", async (req, res) => {
   const aepEdgeClient = createAepEdgeClient(
     EDGE_CONFIG_ID,
-    getAepEdgeClusterCookie(ORGANIZATION_ID, req),
-    EXP_EDGE_BASE_PATH_STAGE
+    getAepEdgeClusterCookie(ORGANIZATION_ID, req)
   );
 
   const aepEdgeCookies = getAepEdgeCookies(req);
