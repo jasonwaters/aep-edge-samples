@@ -40,15 +40,21 @@ const app = express();
 app.use(cookieParser());
 app.use(express.static(path.resolve(__dirname, "..", "public")));
 
-function prepareTemplateVariables(handles) {
+function prepareTemplateVariables({ response = {} }) {
+  const { headers = {}, body = { handle: [] } } = response;
+
   return {
     demoDecisionScopeName,
     edgeConfigId: EDGE_CONFIG_ID,
     orgId: ORGANIZATION_ID,
-    applyHandlesParam: JSON.stringify(
+    applyAepEdgeResponseParam: JSON.stringify(
       {
         renderDecisions: true,
-        handles: handles.filter((item) => item.type !== TYPE_STATE_STORE),
+        responseHeaders: headers,
+        responseBody: {
+          ...body,
+          handle: body.handle.filter((item) => item.type !== TYPE_STATE_STORE),
+        },
       },
       null,
       2
@@ -79,10 +85,7 @@ app.get("/", async (req, res) => {
 
   const template = loadHandlebarsTemplate("index");
 
-  const templateVariables = prepareTemplateVariables(
-    getResponseHandles(aepEdgeResult),
-    getPersonalizationOffer(aepEdgeResult, demoDecisionScopeName).items
-  );
+  const templateVariables = prepareTemplateVariables(aepEdgeResult);
 
   const context = {
     req,
