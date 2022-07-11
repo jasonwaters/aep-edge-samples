@@ -4,7 +4,7 @@
 
 This sample demonstrates using Adobe Experience Platform to get personalization content from Adobe Target.  The web page changes based on the personalization content returned.
 
-This sample retrieves personalization content server-side using the [Adobe Experience Platform APIs](https://developer.adobe.com/experience-platform-apis/) and renders it on the client-side using [Adobe Experience Platform Web SDK](https://experienceleague.adobe.com/docs/experience-platform/edge/home.html) using the `applyHandles` command.
+This sample retrieves personalization content server-side using the [Adobe Experience Platform APIs](https://developer.adobe.com/experience-platform-apis/) and renders it on the client-side using [Adobe Experience Platform Web SDK](https://experienceleague.adobe.com/docs/experience-platform/edge/home.html) using the `applyAepEdgeResponse` command.
 
 Here is what the page looks like before and after personalization content is rendered.
 
@@ -111,30 +111,54 @@ fetch(
 ```
 
 4. The appliction server returns a response with HTML and the identity and cluster cookies.
-5. Within the page, the `applyHandles` command is invoked passing in the handles array from the AEP response.
+5. Within the page, the `applyAepEdgeResponse` command is invoked passing in the headers and body of AEP response.
 
 ```javascript
-alloy("applyHandles", {
-  renderDecisions: true,
-  handles: [ // <-- These handles are from the AEP API response that was fulfilled on the app server.  They are embedded in the HTML response
-    {
-      payload: [
-        {
-          id: "XXX",
-          namespace: {
-            code: "ECID",
-          },
-        },
-      ],
-      type: "identity:result",
+alloy("applyAepEdgeResponse", {
+    "renderDecisions": true,
+    "responseHeaders": {
+      "cache-control": "no-cache, no-store, max-age=0, no-transform, private",
+      "connection": "close",
+      "content-encoding": "deflate",
+      "content-type": "application/json;charset=utf-8",
+      "date": "Mon, 11 Jul 2022 19:42:01 GMT",
+      "server": "jag",
+      "strict-transport-security": "max-age=31536000; includeSubDomains",
+      "transfer-encoding": "chunked",
+      "vary": "Origin",
+      "x-adobe-edge": "OR2;9",
+      "x-content-type-options": "nosniff",
+      "x-konductor": "22.6.78-BLACKOUTSERVERDOMAINS:7fa23f82",
+      "x-rate-limit-remaining": "599",
+      "x-request-id": "5c539bd0-33bf-43b6-a054-2924ac58038b",
+      "x-xss-protection": "1; mode=block"
     },
-    {
-      payload: [{...},{...}],
-      type: "personalization:decisions",
-      eventIndex: 0,
+    "responseBody": {
+      "requestId": "5c539bd0-33bf-43b6-a054-2924ac58038b",
+      "handle": [
+        {
+          "payload": [
+            {
+              "id": "XXX",
+              "namespace": {
+                "code": "ECID"
+              }
+            }
+          ],
+          "type": "identity:result"
+        },
+        {
+          "payload": [
+            {...}, 
+            {...}
+          ],
+          "type": "personalization:decisions",
+          "eventIndex": 0
+        }
+      ]
     }
-  ],
-}).then(applyPersonalization("sample-json-offer"));
+  }
+).then(applyPersonalization("sample-json-offer"));
 
 ```
 
